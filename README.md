@@ -54,7 +54,7 @@ Authoritative cutoff → market snapshot → feature snapshot (hash)
 
 ```bash
 composer install
-copy config\.env.example .env
+Copy-Item config/.env.example .env
 # Configure non-production API credentials in .env
 php vendor/bin/phpunit
 ```
