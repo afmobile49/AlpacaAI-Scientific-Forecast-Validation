@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+/database/*.sqlite
+/database/*.sqlite-*
+/storage/logs/
+/storage/backups/
+/vendor/
+/.phpunit.result.cache

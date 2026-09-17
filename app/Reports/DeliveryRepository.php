@@ -1,0 +1,5 @@
+<?php
+declare(strict_types=1);
+namespace MarketForecast\Reports;
+use PDO;
+final class DeliveryRepository { public function __construct(private readonly PDO $pdo){} public function claim(string $date,string $type,string $recipient,string $subject,string $created):bool{$h=hash('sha256',strtolower(trim($recipient)));$s=$this->pdo->prepare('INSERT OR IGNORE INTO report_deliveries(report_date,report_type,recipient_hash,subject,status,created_at) VALUES(?,?,?,?,?,?)');$s->execute([$date,$type,$h,$subject,'PENDING',$created]);if($s->rowCount()===1)return true;$retry=$this->pdo->prepare("UPDATE report_deliveries SET status='PENDING',last_error=NULL WHERE report_date=? AND report_type=? AND recipient_hash=? AND status IN ('PENDING','FAILED')");$retry->execute([$date,$type,$h]);return $retry->rowCount()===1;} public function markSent(string $date,string $type,string $recipient,string $sent):void{$h=hash('sha256',strtolower(trim($recipient)));$s=$this->pdo->prepare('UPDATE report_deliveries SET status=\'SENT\',sent_at=?,attempt_count=attempt_count+1 WHERE report_date=? AND report_type=? AND recipient_hash=? AND status<>\'SENT\'');$s->execute([$sent,$date,$type,$h]);} }

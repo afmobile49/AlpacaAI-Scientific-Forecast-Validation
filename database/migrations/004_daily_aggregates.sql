@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS daily_aggregates (id INTEGER PRIMARY KEY AUTOINCREMENT, aggregate_date TEXT NOT NULL UNIQUE, forecast_count INTEGER NOT NULL, resolved_count INTEGER NOT NULL, correct_count INTEGER NOT NULL, accuracy REAL, mean_absolute_error REAL, created_at TEXT NOT NULL);

@@ -1,0 +1,5 @@
+<?php
+declare(strict_types=1);
+header('Content-Type: text/html; charset=UTF-8');
+$title='AI Market Forecast Validation System';
+?><!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=htmlspecialchars($title,ENT_QUOTES,'UTF-8')?></title><style>body{font-family:system-ui;max-width:900px;margin:3rem auto;padding:0 1rem;background:#f6f7f9;color:#18202a}.card{background:#fff;border:1px solid #dfe3e8;border-radius:10px;padding:1.25rem;margin:1rem 0}code{background:#eef1f4;padding:.15rem .35rem;border-radius:4px}</style></head><body><h1><?=htmlspecialchars($title,ENT_QUOTES,'UTF-8')?></h1><div class="card"><strong>Experiment:</strong> EXP-001<br><strong>Mode:</strong> Read-only research validation<br><strong>Trading:</strong> Disabled<br><strong>Status:</strong> Foundation and data layers installed</div><div class="card">Predictions and evaluation metrics will appear here after the forecast pipeline is enabled.</div></body></html>

@@ -1,0 +1,5 @@
+<?php
+declare(strict_types=1);
+namespace MarketForecast\Tests;
+use MarketForecast\Database\{Connection,Migrator};use MarketForecast\Reports\DeliveryRepository;use PHPUnit\Framework\TestCase;
+final class DeliveryRepositoryTest extends TestCase { public function testPendingDeliveryCanRetryButSentDeliveryIsIdempotent():void{$p=tempnam(sys_get_temp_dir(),'del-');$pdo=Connection::open($p);(new Migrator($pdo))->apply(dirname(__DIR__).'/database/migrations','2026-01-01T00:00:00Z');$r=new DeliveryRepository($pdo);self::assertTrue($r->claim('2026-01-01','DAILY_REPORT','User@example.com','Daily','2026-01-01T00:00:00Z'));self::assertTrue($r->claim('2026-01-01','DAILY_REPORT',' user@example.com ','Daily','2026-01-01T00:00:00Z'));$r->markSent('2026-01-01','DAILY_REPORT','USER@EXAMPLE.COM','2026-01-01T01:00:00Z');self::assertSame('SENT',$pdo->query('SELECT status FROM report_deliveries')->fetchColumn());self::assertFalse($r->claim('2026-01-01','DAILY_REPORT','user@example.com','Daily','2026-01-01T02:00:00Z'));@unlink($p);@unlink($p.'-wal');@unlink($p.'-shm');} }

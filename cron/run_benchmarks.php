@@ -1,0 +1,8 @@
+<?php
+declare(strict_types=1);
+require dirname(__DIR__).'/vendor/autoload.php';
+use MarketForecast\Database\Connection;
+use MarketForecast\Evaluation\BenchmarkEngine;
+$db=$argv[1]??dirname(__DIR__).'/database/forecast.sqlite';$pdo=Connection::open($db);$rows=$pdo->query("SELECT fp.id,fp.experiment_id,fp.asset_id,fp.generated_at,fp.horizon_code,fp.direction,qp.features_json,ao.actual_direction FROM final_predictions fp JOIN experiments e ON e.id=fp.experiment_id JOIN forecast_pairs p ON p.id=fp.forecast_pair_id JOIN final_predictions ai ON ai.forecast_pair_id=p.id AND ai.source_type='AI' JOIN quant_predictions qp ON qp.id=fp.source_prediction_id JOIN actual_outcomes ao ON ao.final_prediction_id=fp.id WHERE fp.source_type='QUANT' AND e.ai_activation_at IS NOT NULL AND fp.generated_at>=e.ai_activation_at AND ai.generated_at>=e.ai_activation_at")->fetchAll(PDO::FETCH_ASSOC);$engine=new BenchmarkEngine();$codes=['ALWAYS_BULLISH','MOMENTUM_5','MOMENTUM_20','SMA20_VS_SMA50'];$done=0;
+foreach($rows as $r){$f=json_decode($r['features_json'],true,flags:JSON_THROW_ON_ERROR);$f['quant_direction']=$r['direction'];foreach($codes as $code){$pred=$engine->predict($code,$f);$s=$pdo->prepare('INSERT OR IGNORE INTO benchmark_results(experiment_id,asset_id,forecast_date,horizon_code,benchmark_code,predicted_direction,actual_direction,correct,metadata_json) VALUES(?,?,?,?,?,?,?,?,?)');$s->execute([$r['experiment_id'],$r['asset_id'],substr($r['generated_at'],0,10),$r['horizon_code'],$code,$pred,$r['actual_direction'],$pred===$r['actual_direction']?1:0,json_encode(['source_prediction_id'=>(int)$r['id'],'benchmark_version'=>'BENCHMARK_V1'],JSON_THROW_ON_ERROR)]);$done+=$s->rowCount();}}
+echo json_encode(['benchmarks_written'=>$done],JSON_THROW_ON_ERROR).PHP_EOL;

@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1);
+namespace MarketForecast\Indicators;
+final class FeatureSetV1{public function calculate(array $bars):array{$c=array_column($bars,'close');$v=array_column($bars,'volume');return ['feature_set_version'=>'FEATURE_SET_V1','sma20'=>(new SMA(20))->calculate($c),'sma50'=>(new SMA(50))->calculate($c),'ema20'=>(new EMA(20))->calculate($c),'ema50'=>(new EMA(50))->calculate($c),'rsi14'=>(new RSI(14))->calculate($c),'atr14'=>(new ATR(14))->calculateFromBars($bars),'momentum5'=>(new Momentum(5))->calculate($c),'momentum20'=>(new Momentum(20))->calculate($c),'volatility20'=>(new Volatility(20))->calculate($c),'distance_sma20'=>count($c)>=20?(($c[array_key_last($c)]/(new SMA(20))->calculate($c)-1)*100):null,'distance_sma50'=>count($c)>=50?(($c[array_key_last($c)]/(new SMA(50))->calculate($c)-1)*100):null,'volume_ratio20'=>count($v)>=20?($v[array_key_last($v)]/array_sum(array_slice($v,-20))*20):null];}}
